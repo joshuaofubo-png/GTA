@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
+<meta name="description" content="ScamShield helps identify suspicious websites, phishing links, scam messages and fraudulent online offers.">
+<title>ScamShield | Online Scam Checker</title>
+
+<style>
+:root {
+  --bg:#07111f;
+  --panel:#101d30;
+  --panel2:#14243a;
+  --border:#263950;
+  --text:#edf4ff;
+  --muted:#9aabc1;
+  --green:#20d99a;
+  --blue:#53a9ff;
+  --red:#ff586b;
+  --yellow:#ffc65c;
+  --radius:16px;
+}
+* {box-sizing:border-box;margin:0;padding:0}
+html {scroll-behavior:smooth}
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+  line-height:1.6;
+}
+button,input,textarea,select {font:inherit}
+button {cursor:pointer}
+a {color:inherit;text-decoration:none}
+.container {width:min(1150px,92%);margin:auto}
+header {
+  position:sticky;top:0;z-index:10;
+  background:rgba(7,17,31,.94);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(15px);
+}
+.nav {
+  min-height:72px;display:flex;align-items:center;
+  justify-content:space-between;gap:20px;
+}
+.logo {display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800}
+.logo-icon {
+  width:39px;height:39px;border-radius:12px;
+  display:grid;place-items:center;
+  color:#07111f;background:var(--green);font-size:22px;
+}
+.logo span {color:var(--green)}
+.nav-links {display:flex;gap:24px;color:var(--muted);font-size:14px}
+.nav-links a:hover {color:var(--green)}
+.menu-btn {
+  display:none;background:var(--panel);color:white;
+  border:1px solid var(--border);padding:8px 12px;border-radius:8px;
+}
+.hero {padding:75px 0 45px;text-align:center}
+.tag {
+  display:inline-block;color:var(--green);
+  background:#12352f;padding:7px 14px;border-radius:30px;
+  font-size:12px;font-weight:700;letter-spacing:1px;
+  margin-bottom:20px;
+}
+.hero h1 {
+  font-size:clamp(35px,6vw,65px);
+  line-height:1.12;letter-spacing:-2px;
+  max-width:850px;margin:0 auto 20px;
+}
+.hero h1 span {color:var(--green)}
+.hero p {
+  max-width:650px;margin:auto;color:var(--muted);
+  font-size:16px;
+}
+.hero-actions {margin-top:27px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn {
+  border:0;padding:13px 21px;border-radius:10px;
+  font-weight:700;transition:.2s;
+}
+.btn:hover {transform:translateY(-2px);filter:brightness(1.1)}
+.primary {background:var(--green);color:#061a16}
+.secondary {background:var(--panel2);color:white;border:1px solid var(--border)}
+.stats {
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;margin:25px 0 55px;
+}
+.stat {
+  padding:19px;background:var(--panel);
+  border:1px solid var(--border);border-radius:var(--radius);
+  text-align:center;
+}
+.stat strong {font-size:22px;color:var(--green);display:block}
+.stat small {color:var(--muted)}
+.section {padding:40px 0 65px}
+.section-title {text-align:center;margin-bottom:30px}
+.section-title h2 {font-size:30px;margin-bottom:8px}
+.section-title p {color:var(--muted)}
+.checker {
+  max-width:850px;margin:auto;background:var(--panel);
+  border:1px solid var(--border);border-radius:20px;padding:25px;
+}
+.tabs {display:flex;gap:9px;flex-wrap:wrap;margin-bottom:24px}
+.tab {
+  background:var(--panel2);border:1px solid var(--border);
+  color:var(--muted);padding:10px 16px;border-radius:9px;
+}
+.tab.active {background:#164c40;color:var(--green);border-color:var(--green)}
+.field-label {display:block;font-weight:700;margin-bottom:10px}
+textarea,input {
+  width:100%;background:#091525;color:white;
+  border:1px solid var(--border);border-radius:10px;
+  padding:14px;outline:none;
+}
+textarea {min-height:145px;resize:vertical}
+input:focus,textarea:focus {border-color:var(--green)}
+textarea::placeholder,input::placeholder {color:#71839a}
+.field-help {font-size:12px;color:var(--muted);margin:8px 0 18px}
+.check-actions {display:flex;gap:10px;flex-wrap:wrap}
+.check-actions button {flex:1;min-width:130px}
+.result {
+  display:none;margin-top:25px;padding:22px;
+  background:#091525;border:1px solid var(--border);
+  border-radius:15px;
+}
+.result.show {display:block;animation:fade .3s}
+@keyframes fade {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.result-top {display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.score-ring {
+  width:105px;height:105px;border-radius:50%;
+  display:grid;place-items:center;flex-shrink:0;
+  background:conic-gradient(var(--green) 0deg,#263950 0deg);
+  position:relative;
+}
+.score-ring:before {
+  content:"";position:absolute;width:83px;height:83px;
+  background:#091525;border-radius:50%;
+}
+.score-number {z-index:1;font-size:25px;font-weight:800}
+.verdict {font-size:21px;font-weight:800}
+.result-summary {color:var(--muted);font-size:13px;margin-top:5px}
+.result-meta {margin-top:20px;display:flex;gap:9px;flex-wrap:wrap}
+.pill {padding:6px 11px;border-radius:30px;font-size:12px;background:var(--panel2)}
+.warning-list {margin-top:22px}
+.warning-list h3 {font-size:15px;margin-bottom:10px}
+.warning-list ul {list-style:none}
+.warning-list li {
+  padding:9px 0;border-bottom:1px solid var(--border);
+  color:var(--muted);font-size:13px;
+}
+.warning-list li:before {content:"⚠ ";color:var(--yellow)}
+.warning-list li.positive:before {content:"✓ ";color:var(--green)}
+.result-actions {display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.result-actions button {flex:1;min-width:130px}
+.history {margin-top:22px}
+.history h3 {margin-bottom:12px}
+.history-item {
+  display:flex;justify-content:space-between;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+  font-size:13px;color:var(--muted);
+}
+.features {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:17px;
+}
+.feature {
+  padding:22px;background:var(--panel);
+  border:1px solid var(--border);border-radius:var(--radius);
+}
+.feature-icon {font-size:29px;margin-bottom:13px}
+.feature h3 {margin-bottom:7px}
+.feature p {font-size:13px;color:var(--muted)}
+.steps {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:15px;
+}
+.step {
+  background:var(--panel);padding:22px;
+  border:1px solid var(--border);border-radius:var(--radius);
+}
+.step-number {font-size:27px;color:var(--green);font-weight:800}
+.step p {color:var(--muted);font-size:13px;margin-top:8px}
+.tips {
+  display:grid;grid-template-columns:1fr 1fr;gap:15px;
+}
+.tip {
+  padding:18px;background:var(--panel);
+  border:1px solid var(--border);border-radius:12px;
+}
+.tip h3 {font-size:15px;margin-bottom:6px}
+.tip p {font-size:13px;color:var(--muted)}
+.faq {max-width:800px;margin:auto}
+details {
+  background:var(--panel);border:1px solid var(--border);
+  padding:17px;border-radius:11px;margin-bottom:10px;
+}
+summary {cursor:pointer;font-weight:700}
+details p {color:var(--muted);font-size:14px;margin-top:12px}
+footer {
+  border-top:1px solid var(--border);
+  padding:35px 0;color:var(--muted);font-size:13px;
+}
+.footer-content {display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.notice {
+  background:#2b2415;border:1px solid #695328;
+  color:#ffdb91;padding:14px;border-radius:10px;
+  font-size:12px;margin-top:18px;
+}
+@media(max-width:750px) {
+  .nav-links {
+    display:none;position:absolute;top:72px;left:0;width:100%;
+    background:var(--panel);padding:20px;
+    flex-direction:column;border-bottom:1px solid var(--border);
+  }
+  .nav-links.open {display:flex}
+  .menu-btn {display:block}
+  .stats,.features,.steps {grid-template-columns:1fr}
+  .tips {grid-template-columns:1fr}
+  .hero {padding-top:55px}
+  .checker {padding:16px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="container nav">
+    <a href="#" class="logo">
+      <div class="logo-icon">🛡</div>
+      Scam<span>Shield</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#checker">Scam Checker</a>
+      <a href="#features">Features</a>
+      <a href="#tips">Safety Tips</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+  </div>
+</header>
+
+<main>
+<section class="hero container" id="home">
+  <div class="tag">YOUR DIGITAL SAFETY STARTS HERE</div>
+  <h1>Don't Get Scammed.<br><span>Stay One Step Ahead.</span></h1>
+  <p>
+    Check suspicious links, messages, websites and online offers
+    before you trust them. Make smarter decisions and protect
+    your digital identity.
+  </p>
+  <div class="hero-actions">
+    <a href="#checker"><button class="btn primary">Check for Scams →</button></a>
+    <a href="#tips"><button class="btn secondary">Learn Online Safety</button></a>
+  </div>
+</section>
+
+<div class="container stats">
+  <div class="stat"><strong>24/7</strong><small>Self-service checking</small></div>
+  <div class="stat"><strong>4+</strong><small>Types of scam indicators</small></div>
+  <div class="stat"><strong>FREE</strong><small>Basic checking tools</small></div>
+</div>
+
+<section class="section container" id="checker">
+  <div class="section-title">
+    <h2>Scam Detection Center</h2>
+    <p>Paste suspicious content below to examine its risk indicators.</p>
+  </div>
+
+  <div class="checker">
+    <div class="tabs">
+      <button class="tab active" data-type="url">🌐 Website / Link</button>
+      <button class="tab" data-type="message">💬 Message / Email</button>
+      <button class="tab" data-type="phone">📱 Phone Number</button>
+    </div>
+
+    <label class="field-label" id="inputLabel" for="scanInput">
+      Enter a website URL
+    </label>
+    <textarea id="scanInput" placeholder="Example: https://example.com"></textarea>
+    <p class="field-help" id="inputHelp">
+      Enter the complete URL, including https:// if available.
+      Do not open suspicious links to test them.
+    </p>
+
+    <div class="check-actions">
+      <button class="btn primary" onclick="runCheck()">🔍 Analyze Now</button>
+      <button class="btn secondary" onclick="clearInput()">Clear</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="result-top">
+        <div class="score-ring" id="scoreRing">
+          <span class="score-number" id="scoreNumber">0</span>
+        </div>
+        <div>
+          <div class="verdict" id="verdict">Analysis complete</div>
+          <div class="result-summary" id="resultSummary"></div>
+        </div>
+      </div>
+      <div class="result-meta" id="resultMeta"></div>
+      <div class="warning-list">
+        <h3>Analysis details</h3>
+        <ul id="warningList"></ul>
+      </div>
+      <div class="result-actions">
+        <button class="btn secondary" onclick="copyResult()">📋 Copy Report</button>
+        <button class="btn secondary" onclick="clearResult()">New Check</button>
+      </div>
+    </div>
+
+    <div class="history" id="history">
+      <h3>Recent Checks</h3>
+      <div id="historyList"></div>
+    </div>
+
+    <div class="notice">
+      ⚠️ ScamShield uses browser-based indicators and pattern matching.
+      It does not verify a website against a live threat database.
+      A low score does not guarantee safety. Never share passwords,
+      PINs, OTPs or financial information with suspicious parties.
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="features">
+  <div class="section-title">
+    <h2>Protect Yourself Online</h2>
+    <p>Tools designed to help you recognize common online threats.</p>
+  </div>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🌐</div>
+      <h3>URL Analysis</h3>
+      <p>Inspect suspicious links for misleading domains, unusual addresses, insecure connections and other warning signs.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📩</div>
+      <h3>Message Analysis</h3>
+      <p>Identify common phishing language, fake prizes, urgent payment requests and suspicious job offers.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📱</div>
+      <h3>Phone Analysis</h3>
+      <p>Check number formats and identify potentially suspicious patterns. A phone number alone cannot prove fraud.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🇰🇪</div>
+      <h3>Kenya Scam Awareness</h3>
+      <p>Look out for M-Pesa reversal tricks, fake payment confirmations and requests for your mobile-money PIN or OTP.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📊</div>
+      <h3>Risk Scoring</h3>
+      <p>Receive a risk score and a list of the warning signs detected in your submitted content.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🛡️</div>
+      <h3>Safety Education</h3>
+      <p>Learn practical ways to protect your accounts, money, identity and personal information.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="section-title">
+    <h2>How It Works</h2>
+    <p>Three simple steps to examine suspicious content.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">01</div>
+      <h3>Paste</h3>
+      <p>Copy the suspicious website, message or phone number and enter it into the checker.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">02</div>
+      <h3>Analyze</h3>
+      <p>Our browser-based rules examine the submitted content for known warning patterns.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">03</div>
+      <h3>Protect</h3>
+      <p>Review the result and independently verify suspicious requests before taking action.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="tips">
+  <div class="section-title">
+    <h2>Essential Online Safety Tips</h2>
+    <p>Simple habits that can help prevent financial and identity theft.</p>
+  </div>
+  <div class="tips">
+    <div class="tip">
+      <h3>🔐 Never Share Your OTP</h3>
+      <p>Never reveal one-time passwords, mobile-money PINs or banking credentials to callers or strangers.</p>
+    </div>
+    <div class="tip">
+      <h3>💳 Verify Before Paying</h3>
+      <p>Confirm payment requests independently using official contact information.</p>
+    </div>
+    <div class="tip">
+      <h3>🔗 Inspect Links</h3>
+      <p>Check the exact domain before entering passwords or personal details.</p>
+    </div>
+    <div class="tip">
+      <h3>🎁 Question Free Offers</h3>
+      <p>Be cautious of unexpected prizes, giveaways and investment opportunities promising guaranteed returns.</p>
+    </div>
+    <div class="tip">
+      <h3>💼 Verify Job Offers</h3>
+      <p>Be suspicious of employers demanding registration fees, deposits or payments to secure employment.</p>
+    </div>
+    <div class="tip">
+      <h3>📞 Contact Official Support</h3>
+      <p>If someone claims to represent your bank or mobile-money provider, contact the organization through its official channels.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="faq">
+  <div class="section-title">
+    <h2>Frequently Asked Questions</h2>
+    <p>Understand how ScamShield works.</p>
+  </div>
+  <div class="faq">
+    <details>
+      <summary>Is ScamShield free?</summary>
+      <p>Yes. This initial version is a free, browser-based tool.</p>
+    </details>
+    <details>
+      <summary>Can ScamShield detect every scam?</summary>
+      <p>No. It uses predefined warning patterns and cannot detect every fraudulent website, phone number or message.</p>
+    </details>
+    <details>
+      <summary>Does a safe result guarantee a website is legitimate?</summary>
+      <p>No. A website can be fraudulent even when no warning indicators are detected. Always verify independently.</p>
+    </details>
+    <details>
+      <summary>Does it check live scam databases?</summary>
+      <p>No. The initial version performs local pattern analysis. Live reputation checks require trusted external threat-intelligence services and a secure backend.</p>
+    </details>
+    <details>
+      <summary>Does it send my messages to a server?</summary>
+      <p>No. This implementation analyzes submitted content inside your browser. Recent scan history is stored locally on your device.</p>
+    </details>
+    <details>
+      <summary>What should I do if I have already been scammed?</summary>
+      <p>Contact your bank or mobile-money provider immediately through official channels, secure your accounts, preserve evidence and report the incident to the relevant authorities.</p>
+    </details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container footer-content">
+    <div>
+      <div class="logo"><div class="logo-icon">🛡</div>Scam<span>Shield</span></div>
+      <p style="margin-top:10px">Building a safer digital world.</p>
+    </div>
+    <div>
+      <p>© <span id="year"></span> ScamShield. All rights reserved.</p>
+      <p>Independent educational scam-awareness tool.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+let currentType = "url";
+let lastReport = null;
+
+const input = document.getElementById("scanInput");
+const result = document.getElementById("result");
+
+const labels = {
+  url: {
+    label: "Enter a website URL",
+    placeholder: "https://example.com",
+    help: "Enter a complete URL. Do not open suspicious links to test them."
+  },
+  message: {
+    label: "Paste a suspicious message or email",
+    placeholder: "Paste the suspicious SMS, email, WhatsApp message or job offer here...",
+    help: "Remove personal information, passwords and private account details before submitting."
+  },
+  phone: {
+    label: "Enter a phone number",
+    placeholder: "+254712345678",
+    help: "Enter the number including its country code if possible."
+  }
+};
+
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    button.classList.add("active");
+    currentType = button.dataset.type;
+    document.getElementById("inputLabel").textContent = labels[currentType].label;
+    input.placeholder = labels[currentType].placeholder;
+    document.getElementById("inputHelp").textContent = labels[currentType].help;
+    clearResult();
+  });
+});
+
+function toggleMenu() {
+  document.getElementById("navLinks").classList.toggle("open");
+}
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+  link.addEventListener("click", () => {
+    document.getElementById("navLinks").classList.remove("open");
+  });
+});
+
+function clearInput() {
+  input.value = "";
+  clearResult();
+}
+
+function clearResult() {
+  result.classList.remove("show");
+  lastReport = null;
+}
+
+function addFinding(findings, text, points, positive=false) {
+  findings.push({text,points,positive});
+}
+
+function calculate(findings) {
+  let score = 0;
+  findings.forEach(f => score += f.points);
+  return Math.max(0,Math.min(100,score));
+}
+
+function classify(score) {
+  if(score >= 65) return {
+    label:"HIGH RISK",
+    color:"#ff586b",
+    description:"Multiple serious warning indicators were identified."
+  };
+  if(score >= 30) return {
+    label:"SUSPICIOUS",
+    color:"#ffc65c",
+    description:"Some warning indicators were identified. Verify independently."
+  };
+  return {
+    label:"LOW RISK INDICATORS",
+    color:"#20d99a",
+    description:"Few warning indicators were identified. This does not prove safety."
+  };
+}
+
+function analyzeURL(raw) {
+  const findings = [];
+  let score = 0;
+  let parsed;
+
+  let value = raw.trim();
+
+  if(!value) throw new Error("Enter a website URL.");
+
+  if(/[\s<>]/.test(value)) {
+    addFinding(findings,"The input contains spaces or unusual characters.",10);
+    score += 10;
+  }
+
+  let normalized = /^https?:\/\//i.test(value) ? value : "https://" + value;
+
+  try {
+    parsed = new URL(normalized);
+  } catch(e) {
+    throw new Error("This does not appear to be a valid URL. Check the address and try again.");
+  }
+
+  if(!["http:","https:"].includes(parsed.protocol)) {
+    addFinding(findings,"The URL uses an unusual protocol.",35);
+    score += 35;
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  const parts = host.split(".");
+  const knownShorteners = [
+    "bit.ly","tinyurl.c
